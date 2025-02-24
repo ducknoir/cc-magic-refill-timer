@@ -1,7 +1,7 @@
 const TimerApp = (function () {
     let countdown;
     let seconds = 0;
-    let alarmInterval;
+    let alertInterval;
     let startTime;
     let remainingTime;
   
@@ -20,7 +20,7 @@ const TimerApp = (function () {
   
     function resetTimer() {
       if (countdown) clearInterval(countdown);
-      stopAlarm();
+      stopAlert();
       document.getElementById("timer").textContent = "Select a spell to see time";
     }
   
@@ -45,7 +45,7 @@ const TimerApp = (function () {
         } else {
           clearInterval(countdown);
           document.getElementById("timer").textContent = "Time's Up!";
-          playAlarm();
+          playAlert();
         }
       }, 1000);
     }
@@ -56,22 +56,24 @@ const TimerApp = (function () {
       document.getElementById("timer").textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
     }
   
-    function playAlarm() {
-      let soundMode = document.getElementById("soundMode").value;
-      let audio = document.getElementById("alarmSound");
-  
-      if (soundMode === "once") {
-        audio.play();
-      } else if (soundMode === "repeat") {
-        alarmInterval = setInterval(() => {
-          audio.play();
-        }, 3000); // Repeat every 3 seconds
+    function playAlert() {
+        let alertMode = document.getElementById("alertMode").value;
+        let audio = document.getElementById("alertSound");
+      
+        // Ensure the sound is loaded before playing
+        audio.load();
+        audio.play().catch(error => console.log("Playback prevented:", error));
+      
+        if (alertMode === "repeat") {
+          alertInterval = setInterval(() => {
+            audio.play().catch(error => console.log("Playback prevented:", error));
+          }, 3000); // Repeat every 3 seconds
+        }
       }
-    }
-  
-    function stopAlarm() {
-      let audio = document.getElementById("alarmSound");
-      clearInterval(alarmInterval);
+
+      function stopAlert() {
+      let audio = document.getElementById("alertSound");
+      clearInterval(alertInterval);
       audio.pause();
       audio.currentTime = 0;
     }
@@ -82,7 +84,7 @@ const TimerApp = (function () {
       resetTimer,
       addTime,
       subtractTime,
-      stopAlarm,
+      stopAlert,
     };
   })();
   
