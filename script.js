@@ -51,7 +51,7 @@ const TimerApp = (function () {
             { name: "Summon Crafty Pixies", slope: 0.2, offset: 10 },
             { name: "Stretch Time", slope: 0.2, offset: 8 },
             { name: "Diminish Ineptitude", slope: 0.2, offset: 5 },
-            { name: "Haggler's Charm", slope: 0.1, offset: 10 },
+            { name: "Haggler's Charm", slope: 0.1, offset: 10, selected: true },
             { name: "Gambler's Fever Dream", slope: 0.05, offset: 3 },
         ];
 
@@ -61,6 +61,9 @@ const TimerApp = (function () {
             let option = document.createElement("option");
             option.value = timeSeconds;
             option.textContent = `${formatTime(timeSeconds)} - ${spell.name} (${Math.round(magicRemaining)})`;
+            if (spell.selected) {
+                option.selected = true;
+            }
             spellList.appendChild(option);
         });
 
@@ -77,6 +80,7 @@ const TimerApp = (function () {
             return;
         }
         document.getElementById("timer").textContent = formatTime(seconds);
+        updateTabTitle(seconds);
     }
 
     function startTimer() {
@@ -96,6 +100,7 @@ const TimerApp = (function () {
             let elapsed = (performance.now() - startTime) / 1000;
             let newTime = Math.max(0, remainingTime - elapsed);
             document.getElementById("timer").textContent = formatTime(Math.round(newTime));
+            updateTabTitle(newTime);
 
             if (newTime <= 0) {
                 clearInterval(countdown);
@@ -131,6 +136,11 @@ const TimerApp = (function () {
         audio.pause();
         audio.currentTime = 0;
     }
+
+    function updateTabTitle(time) {
+        document.title = time > 0 ? `⏳ ${formatTime(time)} - Magic Timer` : "Time's Up! ⏰";
+    }
+    
 
     /*** Initialize Spell List on Page Load ***/
     document.addEventListener("DOMContentLoaded", () => {
