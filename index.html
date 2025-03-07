@@ -27,60 +27,34 @@
     <div class="container">
       <h2>Magic Recharge Timer</h2>
 
+      <!-- New Input Field for Custom Max Magic -->
+      <div class="mb-3">
+        <label for="customValue" class="form-label">Enter Max Magic:</label>
+        <input
+          type="number"
+          id="customValue"
+          class="form-control"
+          value="99"
+          onchange="TimerApp.updateSpellList()"
+        />
+      </div>
+
       <div class="mb-3">
         <label for="timeSelect" class="form-label">Select Spell:</label>
         <select
           id="timeSelect"
           class="form-select"
           onchange="TimerApp.updateDisplayFromSelection()"
-        >
-          <option value="10">0:10 - Test</option>
-          <option value="1005">16:45 - Spontaneous Edifice (28)</option>
-          <option value="714">11:54 - Force the Hand of Fate (38)</option>
-          <option value="436">7:16 - Conjure Baked Goods (49)</option>
-          <option value="412">6:52 - Resurrect Abomination (50)</option>
-          <option value="365">6:05 - Summon Crafty Pixies (52)</option>
-          <option value="342">5:42 - Stretch Time (53)</option>
-          <option value="319">5:19 - Diminish Ineptitude (54)</option>
-          <option value="297">4:57 - Haggler's Charm (55)</option>
-        </select>
+        ></select>
       </div>
 
       <div class="mb-3">
         <label for="alertMode" class="form-label">Alert Mode:</label>
         <select id="alertMode" class="form-select">
           <option value="off">Disabled</option>
-          <option value="once">Play Once</option>
-          <option value="repeat" selected>Repeat Until Stopped</option>
+          <option value="once" selected>Play Once</option>
+          <option value="repeat">Repeat Until Stopped</option>
         </select>
-      </div>
-
-      <div class="row justify-content-center">
-        <div class="col-auto">
-          <button
-            class="btn btn-danger me-2"
-            onclick="TimerApp.subtractTime(60)"
-          >
-            -1:00
-          </button>
-          <button
-            class="btn btn-danger me-2"
-            onclick="TimerApp.subtractTime(10)"
-          >
-            -0:10
-          </button>
-        </div>
-      </div>
-
-      <div class="row justify-content-center mt-2">
-        <div class="col-auto">
-          <button class="btn btn-success me-2" onclick="TimerApp.addTime(60)">
-            +1:00
-          </button>
-          <button class="btn btn-success me-2" onclick="TimerApp.addTime(10)">
-            +0:10
-          </button>
-        </div>
       </div>
 
       <div class="row justify-content-center mt-2">
@@ -103,10 +77,10 @@
       <h1 id="timer" class="display-4 mt-3">Select a spell to see time</h1>
     </div>
 
-    <!-- Hidden Audio Element -->
     <audio id="alertSound" src="alert.mp3"></audio>
 
     <script src="script.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
