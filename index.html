@@ -21,6 +21,34 @@
       .container {
         max-width: 600px;
       }
+
+      .volume-container {
+        display: flex;
+        align-items: center;
+        padding: 4px 8px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background-color: #fff;
+      }
+      .volume-slider {
+        flex-grow: 1;
+        margin-left: 8px;
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+      }
+      .volume-slider::-webkit-slider-thumb {
+        background: #0d6efd;
+      }
+      .btn-icon {
+        padding: 0.25rem 0.5rem;
+        background: none;
+        border: none;
+        color: #6c757d;
+      }
+      .btn-icon:hover {
+        color: #0d6efd;
+      }
     </style>
   </head>
   <body class="bg-light">
@@ -57,13 +85,12 @@
         </select>
       </div>
 
-      <!-- Add this after the Alert Mode section in your HTML -->
       <div class="mb-3">
         <label for="volumeControl" class="form-label">Volume:</label>
-        <div class="d-flex align-items-center">
+        <div class="volume-container">
           <button
             id="muteButton"
-            class="btn btn-sm btn-outline-secondary me-2"
+            class="btn-icon"
             onclick="TimerApp.toggleMute()"
           >
             <svg
@@ -71,24 +98,15 @@
               width="16"
               height="16"
               fill="currentColor"
-              class="bi bi-volume-up"
               viewBox="0 0 16 16"
               id="volumeIcon"
             >
-              <path
-                d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"
-              />
-              <path
-                d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"
-              />
-              <path
-                d="M10.025 8a4.486 4.486 0 0 1-1.318 3.182L8 10.475A3.489 3.489 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.486 4.486 0 0 1 10.025 8zM7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12V4zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11z"
-              />
+              <!-- SVG paths will be managed by JavaScript -->
             </svg>
           </button>
           <input
             type="range"
-            class="form-range flex-grow-1"
+            class="form-range volume-slider"
             id="volumeControl"
             min="0"
             max="1"
@@ -110,9 +128,6 @@
           >
             Reset
           </button>
-          <button class="btn btn-danger" onclick="TimerApp.stopAlert()">
-            Stop Alert
-          </button>
         </div>
       </div>
 
@@ -124,20 +139,6 @@
 
         <div class="row g-2 align-items-center">
           <div class="col-6">
-            <label for="currentPosition" class="form-label mb-0"
-              >Next up:</label
-            >
-            <input
-              type="number"
-              id="currentPosition"
-              class="form-control text-center"
-              value="0"
-              min="0"
-              onchange="TimerApp.updatePosition(this.value)"
-            />
-          </div>
-
-          <div class="col-6">
             <label for="targetPosition" class="form-label mb-0"
               >Target Position:</label
             >
@@ -148,6 +149,20 @@
               value="0"
               min="0"
               onchange="TimerApp.checkTargetReached()"
+            />
+          </div>
+
+          <div class="col-6">
+            <label for="currentPosition" class="form-label mb-0"
+              >Next up:</label
+            >
+            <input
+              type="number"
+              id="currentPosition"
+              class="form-control text-center"
+              value="0"
+              min="0"
+              onchange="TimerApp.updatePosition(this.value)"
             />
           </div>
         </div>

@@ -136,14 +136,6 @@ const TimerApp = (function () {
         }, 1000);
     }
 
-    function resetTimer() {
-        if (countdown) clearInterval(countdown);
-        stopAlert();
-        elements.timer.textContent = "Select a spell to see time";
-        
-        // Reset the position highlight when resetting the timer
-        elements.currentPositionInput.classList.remove("bg-danger", "text-white");
-    }
 
     function updateTabTitle(time) {
         document.title = time > 0 ? `⏳ ${formatTime(time)} - Magic Timer` : "Time's Up! ⏰";
@@ -164,6 +156,15 @@ const TimerApp = (function () {
                 elements.alertSound.play().catch(error => console.log("Playback prevented:", error));
             }, 3000);
         }
+    }
+
+    function resetTimer() {
+        if (countdown) clearInterval(countdown);
+        stopAlert();
+        elements.timer.textContent = "Select a spell to see time";
+        
+        // Reset the position highlight when resetting the timer
+        elements.currentPositionInput.classList.remove("bg-danger", "text-white");
     }
 
     function stopAlert() {
@@ -195,45 +196,42 @@ const TimerApp = (function () {
         updateVolumeIcon();
     }
     
+    // Simplified volume icon update function
     function updateVolumeIcon() {
-        // Remove all existing path elements
-        while (elements.volumeIcon.firstChild) {
-            elements.volumeIcon.removeChild(elements.volumeIcon.firstChild);
-        }
+        const icon = elements.volumeIcon;
         
-        // Create SVG paths based on current state
+        // Clear existing paths
+        icon.innerHTML = '';
+        
+        // Set the appropriate icon based on the volume state
         if (isMuted) {
             // Muted icon
-            createSVGPath(elements.volumeIcon, "M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z");
-            createSVGPath(elements.volumeIcon, "M9.5 6.5a.5.5 0 0 1 .5.5v1.5a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5z");
-            createSVGPath(elements.volumeIcon, "M10.5 5.5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5z");
-            // Add the X
-            createSVGPath(elements.volumeIcon, "M10.707 11.182A4.486 4.486 0 0 0 12.025 8a4.486 4.486 0 0 0-1.318-3.182L10 5.525A3.489 3.489 0 0 1 11.025 8c0 .966-.392 1.841-1.025 2.475l.707.707z");
-            createSVGPath(elements.volumeIcon, "M12.5 2.134a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 1 0v-11a.5.5 0 0 0-.5-.5zm-7 1a.5.5 0 0 0-.5.5v6a.5.5 0 0 0 1 0v-6a.5.5 0 0 0-.5-.5z");
-            createSVGPath(elements.volumeIcon, "M12.82 10.83l-1.32-1.32c-.293-.293-.768-.293-1.06 0s-.294.768 0 1.06l1.32 1.32c.292.294.767.294 1.06 0s.293-.768 0-1.06zm-1.06-4.78l1.32-1.32c.293-.292.293-.767 0-1.06-.292-.293-.767-.293-1.06 0l-1.32 1.32c-.293.293-.293.768 0 1.06.292.294.767.294 1.06 0z");
-        } 
-        else if (currentVolume === 0) {
-            // Volume at zero but not muted
-            createSVGPath(elements.volumeIcon, "M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z");
-        }
-        else if (currentVolume < 0.5) {
-            // Low volume
-            createSVGPath(elements.volumeIcon, "M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z");
-            createSVGPath(elements.volumeIcon, "M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707z");
-        } 
-        else {
-            // High volume
-            createSVGPath(elements.volumeIcon, "M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z");
-            createSVGPath(elements.volumeIcon, "M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z");
-            createSVGPath(elements.volumeIcon, "M10.025 8a4.486 4.486 0 0 1-1.318 3.182L8 10.475A3.489 3.489 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.486 4.486 0 0 1 10.025 8zM7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12V4zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11z");
+            icon.innerHTML = `
+                <path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+                <path d="M10.717 3.55a.5.5 0 0 1 .5.46v8a.5.5 0 0 1-.812.39l-1.318-1.057-1.41 1.41 1.528 1.226A2 2 0 0 0 12 12.5V3.5a2 2 0 0 0-2.973-1.75L7.44 3.16l1.41 1.41 1.868-1.02z"/>
+                <path d="M10.707 5.707a1 1 0 0 0-1.414-1.414l-4 4a1 1 0 0 0 1.414 1.414l4-4z"/>
+            `;
+        } else if (currentVolume === 0) {
+            // Volume zero icon
+            icon.innerHTML = `
+                <path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+            `;
+        } else if (currentVolume < 0.5) {
+            // Low volume icon
+            icon.innerHTML = `
+                <path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+                <path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707z"/>
+            `;
+        } else {
+            // High volume icon
+            icon.innerHTML = `
+                <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
+                <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/>
+                <path d="M10.025 8a4.486 4.486 0 0 1-1.318 3.182L8 10.475A3.489 3.489 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.486 4.486 0 0 1 10.025 8zM7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12V4zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11z"/>
+            `;
         }
     }
     
-    function createSVGPath(parent, d) {
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", d);
-        parent.appendChild(path);
-    }
 
     /*** FtHoF Queue Position Tracking ***/
     function updatePosition(value) {
@@ -250,13 +248,6 @@ const TimerApp = (function () {
     function incrementPosition() {
         currentPosition++;
         updatePosition(currentPosition);
-    }
-    
-    function decrementPosition() {
-        if (currentPosition > 0) {
-            currentPosition--;
-            updatePosition(currentPosition);
-        }
     }
     
     function checkTargetReached() {
@@ -292,8 +283,10 @@ const TimerApp = (function () {
         if (elements.volumeControl) {
             elements.volumeControl.value = currentVolume;
         }
-        
-        // Initialize position tracking
+
+        updateVolumeIcon();
+
+// Initialize position tracking
         if (elements.currentPositionInput) {
             elements.currentPositionInput.value = currentPosition;
         }
@@ -304,12 +297,9 @@ const TimerApp = (function () {
         updateDisplayFromSelection,
         startTimer,
         resetTimer,
-        stopAlert,
         updateVolume,
         toggleMute,
         updatePosition,
-        incrementPosition,
-        decrementPosition,
         checkTargetReached
     };
 })();
