@@ -43,8 +43,13 @@ const TimerApp = (function () {
 
     /*** Spell List Calculation ***/
     /*** formulas from https://www.desmos.com/calculator/ubnnt6a52d ***/
-    function calculateMagicRemaining(maxMagic, slope, offset) {
-        let magicRemaining = maxMagic - Math.floor(maxMagic * slope + offset);
+    function calculateMagicRemaining(maxMagic, spellObj) {
+        console.log("spell: ", spellObj);
+        let magicUsed = Math.floor(maxMagic * spellObj.slope + spellObj.offset);
+        magicUsed = spellObj.count ? spellObj.count * magicUsed : magicUsed;
+
+        console.log(`magicUsed: ${magicUsed}`);
+        let magicRemaining = maxMagic - magicUsed;
         return Math.max(magicRemaining, 1); // Ensure it's at least 1
     }
 
@@ -77,12 +82,14 @@ const TimerApp = (function () {
             { name: "Summon Crafty Pixies", slope: 0.2, offset: 10 },
             { name: "Stretch Time", slope: 0.2, offset: 8 },
             { name: "Diminish Ineptitude", slope: 0.2, offset: 5 },
+            { name: "Haggler's Charm x3", slope: 0.1, offset: 10, count: 3 },
+            { name: "Haggler's Charm x2", slope: 0.1, offset: 10, count: 2 },
             { name: "Haggler's Charm", slope: 0.1, offset: 10, selected: true },
             { name: "Gambler's Fever Dream", slope: 0.05, offset: 3 },
         ];
 
         spells.forEach((spell) => {
-            let magicRemaining = calculateMagicRemaining(maxMagic, spell.slope, spell.offset);
+            let magicRemaining = calculateMagicRemaining(maxMagic, spell);
             let timeSeconds = calculateTimeSeconds(maxMagic, magicRemaining);
             let option = document.createElement("option");
             option.value = timeSeconds;

@@ -55,73 +55,15 @@
     <div class="container">
       <h2>Magic Recharge Timer</h2>
 
-      <!-- New Input Field for Custom Max Magic -->
-      <div class="mb-3">
-        <label for="customValue" class="form-label">Max Magic:</label>
-        <input
-          type="number"
-          id="customValue"
-          class="form-control"
-          value="99"
-          onchange="TimerApp.updateSpellList()"
-        />
-      </div>
+      <h1 id="timer" class="display-4 mt-3">Select a spell to see time</h1>
 
-      <div class="mb-3">
-        <label for="timeSelect" class="form-label">Spell:</label>
-        <select
-          id="timeSelect"
-          class="form-select"
-          onchange="TimerApp.updateDisplayFromSelection()"
-        ></select>
-      </div>
-
-      <div class="mb-3">
-        <label for="alertMode" class="form-label">Alert Mode:</label>
-        <select id="alertMode" class="form-select">
-          <option value="off">Disabled</option>
-          <option value="once" selected>Play Once</option>
-          <option value="repeat">Repeat</option>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label for="volumeControl" class="form-label">Volume:</label>
-        <div class="volume-container">
-          <button
-            id="muteButton"
-            class="btn-icon"
-            onclick="TimerApp.toggleMute()"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              viewBox="0 0 16 16"
-              id="volumeIcon"
-            >
-              <!-- SVG paths will be managed by JavaScript -->
-            </svg>
-          </button>
-          <input
-            type="range"
-            class="form-range volume-slider"
-            id="volumeControl"
-            min="0"
-            max="1"
-            step="0.01"
-            value="1"
-            oninput="TimerApp.updateVolume(this.value)"
-          />
-        </div>
-      </div>
-
-      <div class="row justify-content-center mt-2">
-        <div class="col-auto">
+      <div class="row mt-2">
+        <div class="col-2 offset-3">
           <button class="btn btn-primary me-2" onclick="TimerApp.startTimer()">
             Start
           </button>
+        </div>
+        <div class="col-2 offset-2">
           <button
             class="btn btn-secondary me-2"
             onclick="TimerApp.resetTimer()"
@@ -131,38 +73,95 @@
         </div>
       </div>
 
-      <h1 id="timer" class="display-4 mt-3">Select a spell to see time</h1>
-
       <!-- FtHoF Queue Position Tracking -->
-      <div class="mb-3 border p-3 rounded bg-light">
-        <h6>FtHoF Queue Position</h6>
+      <div class="row g-2 align-items-center">
+        <div class="offset-3 col-3">
+          <label for="currentPosition" class="form-label mb-0">Next up:</label>
+          <input
+            type="number"
+            id="currentPosition"
+            class="form-control text-center"
+            value="0"
+            min="0"
+            onchange="TimerApp.updatePosition(this.value)"
+          />
+        </div>
 
-        <div class="row g-2 align-items-center">
-          <div class="col-6">
-            <label for="targetPosition" class="form-label mb-0"
-              >Target Position:</label
-            >
-            <input
-              type="number"
-              id="targetPosition"
-              class="form-control text-center"
-              value="0"
-              min="0"
-              onchange="TimerApp.checkTargetReached()"
-            />
-          </div>
+        <div class="col-3">
+          <label for="targetPosition" class="form-label mb-0"
+            >Target Position:</label
+          >
+          <input
+            type="number"
+            id="targetPosition"
+            class="form-control text-center"
+            value="0"
+            min="0"
+            onchange="TimerApp.checkTargetReached()"
+          />
+        </div>
+      </div>
 
-          <div class="col-6">
-            <label for="currentPosition" class="form-label mb-0"
-              >Next up:</label
+      <div class="row">
+        <div class="mb-3 col-3">
+          <label for="customValue" class="form-label">Max Magic:</label>
+          <input
+            type="number"
+            id="customValue"
+            class="form-control"
+            value="99"
+            onchange="TimerApp.updateSpellList()"
+          />
+        </div>
+
+        <div class="mb-3 col">
+          <label for="timeSelect" class="form-label">Spell:</label>
+          <select
+            id="timeSelect"
+            class="form-select"
+            onchange="TimerApp.updateDisplayFromSelection()"
+          ></select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-4">
+          <label for="alertMode" class="form-label">Alert Mode:</label>
+          <select id="alertMode" class="form-select">
+            <option value="off">Disabled</option>
+            <option value="once" selected>Play Once</option>
+            <option value="repeat">Repeat</option>
+          </select>
+        </div>
+
+        <div class="mb-3 col">
+          <label for="volumeControl" class="form-label">Volume:</label>
+          <div class="volume-container">
+            <button
+              id="muteButton"
+              class="btn-icon"
+              onclick="TimerApp.toggleMute()"
             >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+                id="volumeIcon"
+              >
+                <!-- SVG paths will be managed by JavaScript -->
+              </svg>
+            </button>
             <input
-              type="number"
-              id="currentPosition"
-              class="form-control text-center"
-              value="0"
+              type="range"
+              class="form-range volume-slider"
+              id="volumeControl"
               min="0"
-              onchange="TimerApp.updatePosition(this.value)"
+              max="1"
+              step="0.01"
+              value="1"
+              oninput="TimerApp.updateVolume(this.value)"
             />
           </div>
         </div>
