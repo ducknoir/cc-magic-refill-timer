@@ -18,6 +18,9 @@ const TimerApp = (function () {
     // Cached DOM elements
     let elements = {};
     
+    // LocalStorage key
+    const STORAGE_KEY = 'magic-recharge-timer-settings';
+    
     /*** DOM Caching ***/
     function cacheElements() {
         // Cache all frequently accessed DOM elements
@@ -32,6 +35,78 @@ const TimerApp = (function () {
             currentPositionInput: document.getElementById("currentPosition"),
             targetPositionInput: document.getElementById("targetPosition")
         };
+    }
+
+    /*** LocalStorage Functions ***/
+    function saveSettings() {
+        // Create an object with all settings to save
+        const settings = {
+            maxMagic: elements.customValue.value,
+            selectedSpellIndex: elements.timeSelect.selectedIndex,
+            alertMode: elements.alertMode.value,
+            volume: currentVolume,
+            isMuted: isMuted,
+            currentPosition: currentPosition,
+            targetPosition: elements.targetPositionInput.value
+        };
+        
+        // Save to localStorage
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        } catch (error) {
+            console.error('Failed to save settings to localStorage:', error);
+        }
+    }
+    
+    function loadSettings() {
+        try {
+            const savedSettings = localStorage.getItem(STORAGE_KEY);
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                
+                // Apply saved settings
+                if (settings.maxMagic) {
+                    elements.customValue.value = settings.maxMagic;
+                }
+                
+                if (settings.alertMode) {
+                    elements.alertMode.value = settings.alertMode;
+                }
+                
+                if (settings.volume !== undefined) {
+                    currentVolume = parseFloat(settings.volume);
+                    elements.volumeControl.value = currentVolume;
+                }
+                
+                if (settings.isMuted !== undefined) {
+                    isMuted = settings.isMuted;
+                }
+                
+                if (settings.currentPosition !== undefined) {
+                    currentPosition = parseInt(settings.currentPosition);
+                    elements.currentPositionInput.value = currentPosition;
+                }
+                
+                if (settings.targetPosition !== undefined) {
+                    elements.targetPositionInput.value = settings.targetPosition;
+                }
+                
+                // Update the spell list first
+                updateSpellList();
+                
+                // Then set the selected spell index (after list is populated)
+                if (settings.selectedSpellIndex !== undefined && elements.timeSelect.options.length > settings.selectedSpellIndex) {
+                    elements.timeSelect.selectedIndex = settings.selectedSpellIndex;
+                    updateDisplayFromSelection();
+                }
+                
+                // Update UI elements based on loaded settings
+                updateVolumeIcon();
+                checkTargetReached();
+            }
+        } catch (error) {
+            console.error('Failed to load settings from localStorage:', error);
+        }
     }
 
     /*** Utility Functions ***/
@@ -101,6 +176,9 @@ const TimerApp = (function () {
         });
 
         updateDisplayFromSelection(); // Ensure display updates after list is refreshed
+        
+        // Save settings after updating spell list
+        saveSettings();
     }
 
     /*** Timer Controls ***/
@@ -113,6 +191,9 @@ const TimerApp = (function () {
         }
         elements.timer.textContent = formatTime(timerDurationSeconds);
         updateTabTitle(timerDurationSeconds);
+        
+        // Save settings after changing selection
+        saveSettings();
     }
     
     function startTimer() {
@@ -191,6 +272,9 @@ const TimerApp = (function () {
         
         // Update volume icon based on current level
         updateVolumeIcon();
+        
+        // Save settings after changing volume
+        saveSettings();
     }
     
     function toggleMute() {
@@ -201,6 +285,9 @@ const TimerApp = (function () {
         
         // Update the volume icon
         updateVolumeIcon();
+        
+        // Save settings after toggling mute
+        saveSettings();
     }
     
     // Simplified volume icon update function
@@ -250,6 +337,9 @@ const TimerApp = (function () {
         
         // Check if we've reached the target
         checkTargetReached();
+        
+        // Save settings after updating position
+        saveSettings();
     }
     
     function incrementPosition() {
@@ -260,7 +350,8 @@ const TimerApp = (function () {
     function checkTargetReached() {
         const targetPosition = parseInt(elements.targetPositionInput.value);
         
-        if (!isNaN(targetPosition) && currentPosition === targetPosition) {
+        // Only highlight and play alert if both values are non-zero and they match
+        if (!isNaN(targetPosition) && targetPosition > 0 && currentPosition === targetPosition) {
             // Highlight the position display to indicate target reached
             elements.currentPositionInput.classList.add("bg-danger", "text-white");
             
@@ -273,6 +364,9 @@ const TimerApp = (function () {
             // Remove highlight if not at target
             elements.currentPositionInput.classList.remove("bg-danger", "text-white");
         }
+        
+        // Save settings after updating target position
+        saveSettings();
     }
 
     /*** Initialize on Page Load ***/
@@ -280,22 +374,43 @@ const TimerApp = (function () {
         // Cache DOM elements
         cacheElements();
         
-        // Initialize app
-        updateSpellList();
+        // Load saved settings (before initializing the rest of the app)
+        loadSettings();
         
-        // Initialize volume control
-        elements.alertSound.volume = currentVolume;
-        
-        // Set initial value of volume slider
-        if (elements.volumeControl) {
-            elements.volumeControl.value = currentVolume;
+        // If no settings were loaded, initialize with defaults
+        if (!localStorage.getItem(STORAGE_KEY)) {
+            // Initialize app with defaults
+            updateSpellList();
+            
+            // Initialize volume control
+            elements.alertSound.volume = currentVolume;
+            
+            // Set initial value of volume slider
+            if (elements.volumeControl) {
+                elements.volumeControl.value = currentVolume;
+            }
+
+            updateVolumeIcon();
+
+            // Initialize position tracking
+            if (elements.currentPositionInput) {
+                elements.currentPositionInput.value = currentPosition;
+            }
         }
-
-        updateVolumeIcon();
-
-// Initialize position tracking
-        if (elements.currentPositionInput) {
-            elements.currentPositionInput.value = currentPosition;
+        
+        // Set up event listeners for the target position input
+        if (elements.targetPositionInput) {
+            elements.targetPositionInput.addEventListener('change', function() {
+                checkTargetReached();
+                saveSettings();
+            });
+        }
+        
+        // Set up event listener for alert mode changes
+        if (elements.alertMode) {
+            elements.alertMode.addEventListener('change', function() {
+                saveSettings();
+            });
         }
     });
 
