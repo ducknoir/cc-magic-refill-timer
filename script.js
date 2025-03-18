@@ -6,7 +6,11 @@ const TimerApp = (function () {
     let startTime;
     // Duration of countdown in seconds, calculated based on which spell is cast and max magic
     let timerDurationSeconds = 0;
-    
+    let isTimerActive = false; // Tracks if timer has been started since last reset
+
+    let isPaused = false;
+    let pausedTimeRemaining = 0;
+
     // Alert state
     let alertInterval;
     let isMuted = false;
@@ -33,7 +37,8 @@ const TimerApp = (function () {
             volumeControl: document.getElementById("volumeControl"),
             volumeIcon: document.getElementById("volumeIcon"),
             currentPositionInput: document.getElementById("currentPosition"),
-            targetPositionInput: document.getElementById("targetPosition")
+            targetPositionInput: document.getElementById("targetPosition"),
+            startButton: document.querySelector('button.btn-primary')
         };
     }
 
@@ -195,35 +200,124 @@ const TimerApp = (function () {
         // Save settings after changing selection
         saveSettings();
     }
-    
+
     function startTimer() {
+        // If timer is running, pause it
+        if (countdown && !isPaused) {
+            pauseTimer();
+            return;
+        }
+        
+        // If timer is paused, resume it
+        if (isPaused) {
+            resumeTimer();
+            return;
+        }
+        
+        // Otherwise start a new timer
         if (countdown) clearInterval(countdown);
+        stopAlert(); // Stop any playing alerts
+        
         const selectedTime = parseInt(elements.timeSelect.value);
         if (isNaN(selectedTime) || selectedTime <= 0) {
             elements.timer.textContent = "Invalid time selected";
             return;
         }
+        
         startTime = performance.now();
         timerDurationSeconds = selectedTime;
+        isPaused = false;
+        countdown = true; // Set countdown to true to indicate timer is running
+        isTimerActive = true; // Mark timer as active
+
+        // Update the start button text to "Pause" immediately
+        updateStartButtonText();
+        
+        runCountdown();
+    }
+ 
+    function pauseTimer() {
+        if (!countdown) return;
+        
+        clearInterval(countdown);
+        
+        // Calculate the time remaining when paused
+        let elapsed = (performance.now() - startTime) / 1000;
+        pausedTimeRemaining = Math.max(0, timerDurationSeconds - elapsed);
+        
+        isPaused = true;
+        
+        // Update the start button text
+        updateStartButtonText();
+    }
+
+    function resumeTimer() {
+        if (!isPaused) return;
+        
+        // Set the new start time based on the remaining time
+        startTime = performance.now() - ((timerDurationSeconds - pausedTimeRemaining) * 1000);
+        
+        isPaused = false;
+        
+        // Update the start button text
+        updateStartButtonText();
+        
         runCountdown();
     }
 
+    function updateStartButtonText() {
+        const startButton = document.querySelector('button.btn-primary');
+        if (!startButton) return;
+        
+        if (countdown && !isPaused) {
+            startButton.textContent = "Pause";
+        } else if (isPaused) {
+            startButton.textContent = "Resume";
+        } else {
+            startButton.textContent = "Start";
+        }
+    }
+
+    function updateResetButtonState() {
+        const resetButton = document.querySelector('button.btn-secondary');
+        if (!resetButton) return;
+        
+        if (isTimerActive) {
+            // Timer is or has been active since last reset - show as primary button
+            resetButton.classList.remove('btn-secondary');
+            resetButton.classList.add('btn-primary');
+            resetButton.disabled = false;
+        } else {
+            // Timer is already in reset state - show as secondary (gray) button
+            resetButton.classList.remove('btn-primary');
+            resetButton.classList.add('btn-secondary');
+        }
+    }
+    
     function runCountdown() {
+        // Clear any existing interval
+        if (countdown && typeof countdown === 'number') {
+            clearInterval(countdown);
+        }
+        
+        // Create new interval
         countdown = setInterval(() => {
             let elapsed = (performance.now() - startTime) / 1000;
             let newTime = Math.max(0, timerDurationSeconds - elapsed);
             elements.timer.textContent = formatTime(Math.round(newTime));
             updateTabTitle(newTime);
-
+    
             if (newTime <= 0) {
                 clearInterval(countdown);
+                countdown = null; // Clear the countdown flag
+                isPaused = false;
                 elements.timer.textContent = "Time's Up!";
+                updateStartButtonText(); // Update button text when timer completes
                 playAlert();
                 incrementPosition(); // Increment the position counter when timer completes
             }
         }, 1000);
     }
-
 
     function updateTabTitle(time) {
         document.title = time > 0 ? `⏳ ${formatTime(time)} - Magic Timer` : "Time's Up! ⏰";
@@ -247,9 +341,19 @@ const TimerApp = (function () {
     }
 
     function resetTimer() {
-        if (countdown) clearInterval(countdown);
+        if (countdown && typeof countdown === 'number') {
+            clearInterval(countdown);
+        }
         stopAlert();
-        elements.timer.textContent = "Select a spell to see time";
+        countdown = null; // Clear the countdown flag
+        isPaused = false;
+        pausedTimeRemaining = 0;
+        
+        // Update the display to show the selected time from dropdown instead of "Select a spell"
+        updateDisplayFromSelection();
+        
+        // Update the start button text
+        updateStartButtonText();
         
         // Reset the position highlight when resetting the timer
         elements.currentPositionInput.classList.remove("bg-danger", "text-white");
